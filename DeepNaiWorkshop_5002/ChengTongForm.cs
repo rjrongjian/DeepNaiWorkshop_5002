@@ -10,16 +10,17 @@ using System.Windows.Forms;
 
 namespace DeepNaiWorkshop_5002
 {
-    public partial class Form1 : Form
+    public partial class ChengTongForm : Form
     {
-        public Form1()
+        public ChengTongForm()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void ChengTongForm_Load(object sender, EventArgs e)
         {
-
+            this.webBrowser1.Navigate("https://u16673263.ctfile.com/fs/16673263-236849443");
+            this.webBrowser1.ScriptErrorsSuppressed = true;
         }
     }
 }
