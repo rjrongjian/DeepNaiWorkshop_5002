@@ -11,6 +11,7 @@ namespace DeepNaiWorkshop_5002.MyTool
     /// </summary>
     class SourceFromConfig
     {
+        public static int ROUTING_SINA_BLOG_TYPE = 1;//伪装路由是新浪微博的
         private static List<SourceFromData> sourceFromList;
         static SourceFromConfig()
         {

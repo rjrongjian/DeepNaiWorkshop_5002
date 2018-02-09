@@ -95,17 +95,29 @@ namespace DeepNaiWorkshop_5002
             //直接转换成ChromiumWebBrowser browserFor 不能获取Address
             var browserFor = (ChromiumWebBrowser)sender;
             //Console.WriteLine("获取的地址："+ browserFor.Address);
+            var result = await browser.GetSourceAsync();
             if (sourceFromData.FromSource.Contains(browserFor.Address))//说明进到了伪装的一级路由页面
             {
-
+                if (SourceFromConfig.ROUTING_SINA_BLOG_TYPE == sourceFromData.Type)
+                {
+                    browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("");
+                }
+                else
+                {
+                    throw new Exception("不能识别的伪装路由类型："+ sourceFromData.Type);
+                }
+            }
+            else//说明已经到了具体下载页面了
+            {
+                browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
             }
             
             
 
-            var result = await browser.GetSourceAsync();
+            
             // Console.WriteLine("页面加载完成：" + result);
             Console.WriteLine("sender:"+ sender);
-            //browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
+            //
         }
     }
 }
