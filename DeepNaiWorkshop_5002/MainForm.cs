@@ -92,13 +92,18 @@ namespace DeepNaiWorkshop_5002
         /// <param name="e"></param>
         private async void browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
+            //直接转换成ChromiumWebBrowser browserFor 不能获取Address
+            var browserFor = (ChromiumWebBrowser)sender;
+            //Console.WriteLine("获取的地址："+ browserFor.Address);
+            if (sourceFromData.FromSource.Contains(browserFor.Address))//说明进到了伪装的一级路由页面
+            {
 
-
-            ChromiumWebBrowser browserTemp =(ChromiumWebBrowser)sender;
-            FrameLoadEndEventArgs eTemp = e;
+            }
+            
+            
 
             var result = await browser.GetSourceAsync();
-            Console.WriteLine("页面加载完成：" + result);
+            // Console.WriteLine("页面加载完成：" + result);
             Console.WriteLine("sender:"+ sender);
             //browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
         }
