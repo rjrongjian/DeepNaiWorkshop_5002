@@ -32,6 +32,7 @@ namespace CefTest
                     }
                     filepath = filepath + "\\" + xj.EncryptMD5String(DateTime.Now.ToString()) + "_"+ downloadItem.SuggestedFileName;
                     callback.Continue(filepath, showDialog: false);
+
                 }
             }
         }
