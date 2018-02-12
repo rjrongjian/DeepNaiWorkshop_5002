@@ -77,15 +77,15 @@ namespace DeepNaiWorkshop_5002
 
             browser.Dock = DockStyle.Fill;
             //Console.WriteLine("browser是否初始化：" + browser);
+            //每次请求更换ip
             Cef.UIThreadTaskFactory.StartNew(delegate {
                 String ipAndPort = WuyouProxy.getProxyIpAndPort();
                 //Console.WriteLine("获取的ip:" + ipAndPort);
-                Console.WriteLine("browser2是否初始化：" + browser);
+                //Console.WriteLine("browser2是否初始化：" + browser);
                 var rc = Cef.GetGlobalRequestContext();
                 var v = new Dictionary<string,
                     object>();
                 v["mode"] = "fixed_servers";
-                //TODO:测试屏蔽代理
                 //v["server"] = ipAndPort;
                 v["User-Agent"] = userAgent;
                string error;
@@ -117,11 +117,13 @@ namespace DeepNaiWorkshop_5002
                 {
                     if (SourceFromConfig.ROUTING_SINA_BLOG_TYPE == sourceFromData.Type)
                     {
-                        Random rd = new Random(5);
-                        int randomSleepSecond = rd.Next()+2;
+                        
+                        Random rd = new Random();
+                        int randomSleepSecond = rd.Next(1,6);//1-5秒
                         Console.WriteLine("进入的伪装路由连接：" + sourceFromData.FromSource + "，且类型为新浪博客");
                         Console.WriteLine("从伪装页面进入下载页面的随机睡眠时间："+randomSleepSecond+"s");
                         Thread.Sleep(randomSleepSecond*1000);
+                        /*
                         StringBuilder scriptCode = new StringBuilder();
                         scriptCode.Append("var aElements = new Array();");
                         scriptCode.Append("var x = document.getElementById('sina_keyword_ad_area2').getElementsByTagName(\"div\");");
@@ -136,6 +138,9 @@ namespace DeepNaiWorkshop_5002
                         scriptCode.Append("}");
                         scriptCode.Append("var randomA = aElements[Math.floor(Math.random()*aElements.length)];");
                         browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(scriptCode.ToString());
+                        */
+                        Console.WriteLine("下来了");
+                        browser.Load("https://u16673263.ctfile.com/fs/16673263-236849439");
                     }
                     else
                     {
