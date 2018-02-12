@@ -10,6 +10,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -50,6 +51,7 @@ namespace DeepNaiWorkshop_5002
             {
                 CefSettings settings = new CefSettings();
                 settings.UserAgent = userAgent;
+                
 
                 //settings.CefCommandLineArgs.Add("proxy-server", ipAndPort);
                 //settings.UserAgent = "Hello!";
@@ -58,9 +60,21 @@ namespace DeepNaiWorkshop_5002
             }
 
             //browser = new ChromiumWebBrowser("https://www.baidu.com/s?wd=%E6%88%91%E7%9A%84ip&rsv_spt=1&rsv_iqid=0x914838db0001e715&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=94789287_hao_pg&rsv_enter=1&rsv_sug3=5&rsv_sug1=3&rsv_sug7=100&rsv_t=2fec3e53%2FvqkD9VS1c4ogr84NRknqB%2FGqrZrxz5Cxm5EsGDivYD6hdnRTYE7%2BQZBJN4p7tl%2B");
-            browser = new ChromiumWebBrowser(sourceFromData.FromSource);
+            browser = new ChromiumWebBrowser(sourceFromData.FromSource) {
+                BrowserSettings = new BrowserSettings()
+                {
+                    Plugins = CefState.Enabled
+                },
+                Dock = DockStyle.Fill
+            };
+
             browser.FrameLoadEnd += browser_FrameLoadEnd;//网页加载完成
             browser.DownloadHandler = new MyDownLoadFile();//下载器配置
+            //TODO: 在官方demo里CefSharp.Example中->Handlers->RequestHandler中93行说明了如何让每次请求都更改user-agent,可以参考
+            //browser.RequestHandler = new MyRequestHandler();//每次请求都更换User-Agent 注意IRequestHandler在CefSharp.IRequestHandler
+            
+
+
             browser.Dock = DockStyle.Fill;
             //Console.WriteLine("browser是否初始化：" + browser);
             Cef.UIThreadTaskFactory.StartNew(delegate {
@@ -71,7 +85,8 @@ namespace DeepNaiWorkshop_5002
                 var v = new Dictionary<string,
                     object>();
                 v["mode"] = "fixed_servers";
-                v["server"] = ipAndPort;
+                //TODO:测试屏蔽代理
+                //v["server"] = ipAndPort;
                 v["User-Agent"] = userAgent;
                string error;
                 bool success = rc.SetPreference("proxy", v, out error);
@@ -92,32 +107,59 @@ namespace DeepNaiWorkshop_5002
         /// <param name="e"></param>
         private async void browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
-            //直接转换成ChromiumWebBrowser browserFor 不能获取Address
-            var browserFor = (ChromiumWebBrowser)sender;
-            //Console.WriteLine("获取的地址："+ browserFor.Address);
-            var result = await browser.GetSourceAsync();
-            if (sourceFromData.FromSource.Contains(browserFor.Address))//说明进到了伪装的一级路由页面
+            if (e.Frame.IsMain)//单次加载页面会调用此事件多次，需加这个判断
             {
-                if (SourceFromConfig.ROUTING_SINA_BLOG_TYPE == sourceFromData.Type)
+                //直接转换成ChromiumWebBrowser browserFor 不能获取Address
+                var browserFor = (ChromiumWebBrowser)sender;
+                //Console.WriteLine("获取的地址："+ browserFor.Address);
+                var result = await browser.GetSourceAsync();
+                if (sourceFromData.FromSource.Contains(browserFor.Address))//说明进到了伪装的一级路由页面
                 {
-                    browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("");
+                    if (SourceFromConfig.ROUTING_SINA_BLOG_TYPE == sourceFromData.Type)
+                    {
+                        Random rd = new Random(5);
+                        int randomSleepSecond = rd.Next()+2;
+                        Console.WriteLine("进入的伪装路由连接：" + sourceFromData.FromSource + "，且类型为新浪博客");
+                        Console.WriteLine("从伪装页面进入下载页面的随机睡眠时间："+randomSleepSecond+"s");
+                        Thread.Sleep(randomSleepSecond*1000);
+                        StringBuilder scriptCode = new StringBuilder();
+                        scriptCode.Append("var aElements = new Array();");
+                        scriptCode.Append("var x = document.getElementById('sina_keyword_ad_area2').getElementsByTagName(\"div\");");
+                        scriptCode.Append("for(var i = 0;i<x.length;i++){");
+                        scriptCode.Append("    var sonDiv = x[i];");
+                        scriptCode.Append("    var aInSonDiv = sonDiv.getElementsByTagName(\"a\");");
+                        scriptCode.Append("    if(aInSonDiv&&aInSonDiv.length>0){");
+                        scriptCode.Append("        aElements[aElements.length] = aInSonDiv[0];");
+                        scriptCode.Append("    }else{//不包含自标签的忽略");
+                        scriptCode.Append("        console.log(\"不包含子标签\");");
+                        scriptCode.Append("    }");
+                        scriptCode.Append("}");
+                        scriptCode.Append("var randomA = aElements[Math.floor(Math.random()*aElements.length)];");
+                        browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(scriptCode.ToString());
+                    }
+                    else
+                    {
+                        throw new Exception("不能识别的伪装路由类型：" + sourceFromData.Type);
+                    }
                 }
-                else
+                else//说明已经到了具体下载页面了
                 {
-                    throw new Exception("不能识别的伪装路由类型："+ sourceFromData.Type);
+                    Console.WriteLine("城通网盘下载页面，开始下载...");
+                    browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
                 }
-            }
-            else//说明已经到了具体下载页面了
-            {
-                browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
-            }
-            
-            
 
-            
-            // Console.WriteLine("页面加载完成：" + result);
-            Console.WriteLine("sender:"+ sender);
-            //
+
+
+
+                // Console.WriteLine("页面加载完成：" + result);
+                Console.WriteLine("sender:" + sender);
+                //
+            }
+            else
+            {
+                Console.WriteLine("非主窗口加载完毕，不执行任何逻辑！");
+            }
+
         }
     }
 }
