@@ -74,9 +74,10 @@ namespace DeepNaiWorkshop_5002
 
             browser.FrameLoadEnd += browser_FrameLoadEnd;//网页加载完成
             browser.DownloadHandler = new MyDownLoadFile();//下载器配置
+            browser.LifeSpanHandler = new MyLifeSpanHandler();//在同一窗口打开链接
             //TODO: 在官方demo里CefSharp.Example中->Handlers->RequestHandler中93行说明了如何让每次请求都更改user-agent,可以参考
             //browser.RequestHandler = new MyRequestHandler();//每次请求都更换User-Agent 注意IRequestHandler在CefSharp.IRequestHandler
-            
+
 
 
             browser.Dock = DockStyle.Fill;
@@ -90,7 +91,7 @@ namespace DeepNaiWorkshop_5002
                 var v = new Dictionary<string,
                     object>();
                 v["mode"] = "fixed_servers";
-                v["server"] = ipAndPort;
+                //v["server"] = ipAndPort;
                 v["User-Agent"] = userAgent;
                string error;
                 bool success = rc.SetPreference("proxy", v, out error);

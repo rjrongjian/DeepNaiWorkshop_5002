@@ -82,6 +82,7 @@
     <Compile Include="HttpCode\MyCookie.cs" />
     <Compile Include="HttpCode\OtherHelper.cs" />
     <Compile Include="HttpCode\XJHTTP.cs" />
+    <Compile Include="MyLifeSpanHandler.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
