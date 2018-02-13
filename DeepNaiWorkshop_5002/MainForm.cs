@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -49,9 +50,12 @@ namespace DeepNaiWorkshop_5002
             String userAgent = UserAgent.randomUserAgent();
             if (!Cef.IsInitialized)
             {
-                CefSettings settings = new CefSettings();
+                CefSettings settings = new CefSettings() {
+                    CachePath = Directory.GetCurrentDirectory() + @"\Cache",
+                };
                 settings.UserAgent = userAgent;
-                
+                settings.PersistSessionCookies = true;//支持cookie
+                settings.CefCommandLineArgs.Add("ppapi-flash-path", @"Plugins\pepflashplayer.dll");//cef 支持flash http://blog.csdn.net/xxhongdev/article/details/77195339
 
                 //settings.CefCommandLineArgs.Add("proxy-server", ipAndPort);
                 //settings.UserAgent = "Hello!";
@@ -86,7 +90,7 @@ namespace DeepNaiWorkshop_5002
                 var v = new Dictionary<string,
                     object>();
                 v["mode"] = "fixed_servers";
-                //v["server"] = ipAndPort;
+                v["server"] = ipAndPort;
                 v["User-Agent"] = userAgent;
                string error;
                 bool success = rc.SetPreference("proxy", v, out error);
@@ -123,7 +127,7 @@ namespace DeepNaiWorkshop_5002
                         Console.WriteLine("进入的伪装路由连接：" + sourceFromData.FromSource + "，且类型为新浪博客");
                         Console.WriteLine("从伪装页面进入下载页面的随机睡眠时间："+randomSleepSecond+"s");
                         Thread.Sleep(randomSleepSecond*1000);
-                        /*
+                        
                         StringBuilder scriptCode = new StringBuilder();
                         scriptCode.Append("var aElements = new Array();");
                         scriptCode.Append("var x = document.getElementById('sina_keyword_ad_area2').getElementsByTagName(\"div\");");
@@ -132,15 +136,14 @@ namespace DeepNaiWorkshop_5002
                         scriptCode.Append("    var aInSonDiv = sonDiv.getElementsByTagName(\"a\");");
                         scriptCode.Append("    if(aInSonDiv&&aInSonDiv.length>0){");
                         scriptCode.Append("        aElements[aElements.length] = aInSonDiv[0];");
-                        scriptCode.Append("    }else{//不包含自标签的忽略");
+                        scriptCode.Append("    }else{");
                         scriptCode.Append("        console.log(\"不包含子标签\");");
                         scriptCode.Append("    }");
                         scriptCode.Append("}");
                         scriptCode.Append("var randomA = aElements[Math.floor(Math.random()*aElements.length)];");
+                        scriptCode.Append("randomA.click();");
                         browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(scriptCode.ToString());
-                        */
-                        Console.WriteLine("下来了");
-                        browser.Load("https://u16673263.ctfile.com/fs/16673263-236849439");
+                        Console.WriteLine("执行到这"+ scriptCode.ToString());
                     }
                     else
                     {
