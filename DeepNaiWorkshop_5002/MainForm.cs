@@ -20,6 +20,8 @@ namespace DeepNaiWorkshop_5002
     public partial class MainForm : Form
     {
         private ChromiumWebBrowser browser;
+        //实例化一个timer  
+        private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
         private SourceFromData sourceFromData;
         public MainForm()
         {
@@ -91,7 +93,7 @@ namespace DeepNaiWorkshop_5002
                 var v = new Dictionary<string,
                     object>();
                 v["mode"] = "fixed_servers";
-                //v["server"] = ipAndPort;
+                v["server"] = ipAndPort;
                 v["User-Agent"] = userAgent;
                string error;
                 bool success = rc.SetPreference("proxy", v, out error);
@@ -169,6 +171,36 @@ namespace DeepNaiWorkshop_5002
                 Console.WriteLine("非主窗口加载完毕，不执行任何逻辑！");
             }
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //给timer挂起事件  
+            myTimer.Tick += new EventHandler(Callback);
+            //使timer可用  
+            myTimer.Enabled = true;
+            //获取时间间隔
+            String time = this.textBox1.Text;
+            Console.WriteLine("设置的时间间隔："+ (int.Parse(time) * 1000)+"毫秒");
+            //设置时间间隔，以毫秒为单位  
+            myTimer.Interval = int.Parse(time) * 1000;
+        }
+
+        //回调函数  
+        private void Callback(object sender, EventArgs e)
+        {
+            //获取系统时间 20:16:16  
+            //textBox1.Text = DateTime.Now.ToLongTimeString().ToString();
+            this.label2.Text = DateTime.Now.ToLongTimeString().ToString();
+
+            //执行业务逻辑
+            oneThreadChengTongService();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //计时开始  
+            myTimer.Stop();
         }
     }
 }
