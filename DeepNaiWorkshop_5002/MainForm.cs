@@ -56,7 +56,7 @@ namespace DeepNaiWorkshop_5002
                     CachePath = Directory.GetCurrentDirectory() + @"\Cache",
                 };
                 settings.UserAgent = userAgent;
-                settings.PersistSessionCookies = true;//支持cookie
+                settings.PersistSessionCookies = false;//支持cookie
                 settings.CefCommandLineArgs.Add("ppapi-flash-path", @"Plugins\pepflashplayer.dll");//cef 支持flash http://blog.csdn.net/xxhongdev/article/details/77195339
 
                 //settings.CefCommandLineArgs.Add("proxy-server", ipAndPort);
@@ -97,7 +97,7 @@ namespace DeepNaiWorkshop_5002
                 v["mode"] = "fixed_servers";
                 //v["server"] = WuyouProxy.getProxyIpAndPort();
                 v["User-Agent"] = userAgent;
-               string error;
+                string error;
                 bool success = rc.SetPreference("proxy", v, out error);
                 if (success)
                 {
@@ -168,8 +168,10 @@ namespace DeepNaiWorkshop_5002
                         var v = new Dictionary<string,
                             object>();
                         v["mode"] = "fixed_servers";
+//2018-02-22 测试关闭了代理ip
                         v["server"] = WuyouProxy.getProxyIpAndPort();
                         v["User-Agent"] = UserAgent.randomUserAgent();
+                        v["Referer"] = sourceFromData.FromSource;//设置来源信息
                         string error;
                         bool success = rc.SetPreference("proxy", v, out error);
                         if (success)
@@ -180,9 +182,9 @@ namespace DeepNaiWorkshop_5002
                     //Console.WriteLine("测试load");
                     //browser.Load("https://www.baidu.com/s?wd=%E6%88%91%E7%9A%84ip&rsv_spt=1&rsv_iqid=0x914838db0001e715&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=94789287_hao_pg&rsv_enter=1&rsv_sug3=5&rsv_sug1=3&rsv_sug7=100&rsv_t=2fec3e53%2FvqkD9VS1c4ogr84NRknqB%2FGqrZrxz5Cxm5EsGDivYD6hdnRTYE7%2BQZBJN4p7tl%2B");
                     Random rd = new Random();
-                    int randomSleepSecond = rd.Next(1, 6);//1-5秒
+                    int randomSleepSecond = rd.Next(1000, 6000);//1000-5999毫秒
                     Console.WriteLine("点击下载之头，随机睡眠：" + randomSleepSecond + "s");
-                    Thread.Sleep(randomSleepSecond * 1000);
+                    Thread.Sleep(randomSleepSecond);
 
                     Console.WriteLine("城通网盘下载页面，开始下载...");
                     browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
