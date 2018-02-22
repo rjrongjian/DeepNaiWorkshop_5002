@@ -60,6 +60,7 @@ namespace DeepNaiWorkshop_5002
                 settings.CefCommandLineArgs.Add("ppapi-flash-path", @"Plugins\pepflashplayer.dll");//cef 支持flash http://blog.csdn.net/xxhongdev/article/details/77195339
 
                 //settings.CefCommandLineArgs.Add("proxy-server", ipAndPort);
+                //settings.CefCommandLineArgs.Add("no-proxy-server", "1")
                 //settings.UserAgent = "Hello!";
 
                 Cef.Initialize(settings);
