@@ -66,7 +66,9 @@ namespace DeepNaiWorkshop_5002
             }
 
             //browser = new ChromiumWebBrowser("https://www.baidu.com/s?wd=%E6%88%91%E7%9A%84ip&rsv_spt=1&rsv_iqid=0x914838db0001e715&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=94789287_hao_pg&rsv_enter=1&rsv_sug3=5&rsv_sug1=3&rsv_sug7=100&rsv_t=2fec3e53%2FvqkD9VS1c4ogr84NRknqB%2FGqrZrxz5Cxm5EsGDivYD6hdnRTYE7%2BQZBJN4p7tl%2B");
+            String testIp = "https://www.baidu.com/s?wd=%E6%88%91%E7%9A%84ip&rsv_spt=1&rsv_iqid=0x914838db0001e715&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=94789287_hao_pg&rsv_enter=1&rsv_sug3=5&rsv_sug1=3&rsv_sug7=100&rsv_t=2fec3e53%2FvqkD9VS1c4ogr84NRknqB%2FGqrZrxz5Cxm5EsGDivYD6hdnRTYE7%2BQZBJN4p7tl%2B";
             browser = new ChromiumWebBrowser(sourceFromData.FromSource) {
+            //browser = new ChromiumWebBrowser(testIp){
                 BrowserSettings = new BrowserSettings()
                 {
                     Plugins = CefState.Enabled
@@ -84,16 +86,15 @@ namespace DeepNaiWorkshop_5002
 
             browser.Dock = DockStyle.Fill;
             //Console.WriteLine("browser是否初始化：" + browser);
-            //每次请求更换ip
+            //由于在下载之头启用了代理ip，此处要禁止代理ip
             Cef.UIThreadTaskFactory.StartNew(delegate {
-                String ipAndPort = WuyouProxy.getProxyIpAndPort();
                 //Console.WriteLine("获取的ip:" + ipAndPort);
                 //Console.WriteLine("browser2是否初始化：" + browser);
                 var rc = Cef.GetGlobalRequestContext();
                 var v = new Dictionary<string,
                     object>();
                 v["mode"] = "fixed_servers";
-                v["server"] = ipAndPort;
+                //v["server"] = WuyouProxy.getProxyIpAndPort();
                 v["User-Agent"] = userAgent;
                string error;
                 bool success = rc.SetPreference("proxy", v, out error);
@@ -125,11 +126,11 @@ namespace DeepNaiWorkshop_5002
                     if (SourceFromConfig.ROUTING_SINA_BLOG_TYPE == sourceFromData.Type)
                     {
                         
-                        Random rd = new Random();
-                        int randomSleepSecond = rd.Next(1,6);//1-5秒
+                        //Random rd = new Random();
+                        //int randomSleepSecond = rd.Next(1,6);//1-5秒
                         Console.WriteLine("进入的伪装路由连接：" + sourceFromData.FromSource + "，且类型为新浪博客");
-                        Console.WriteLine("从伪装页面进入下载页面的随机睡眠时间："+randomSleepSecond+"s");
-                        Thread.Sleep(randomSleepSecond*1000);
+                        //Console.WriteLine("从伪装页面进入下载页面的随机睡眠时间："+randomSleepSecond+"s");
+                        //Thread.Sleep(randomSleepSecond*1000);
                         
                         StringBuilder scriptCode = new StringBuilder();
                         scriptCode.Append("var aElements = new Array();");
@@ -155,6 +156,33 @@ namespace DeepNaiWorkshop_5002
                 }
                 else//说明已经到了具体下载页面了
                 {
+
+                    //每次请求更换ip
+                    
+                    await Cef.UIThreadTaskFactory.StartNew(delegate
+                    {
+                        //Console.WriteLine("获取的ip:" + ipAndPort);
+                        //Console.WriteLine("browser2是否初始化：" + browser);
+                        var rc = Cef.GetGlobalRequestContext();
+                        var v = new Dictionary<string,
+                            object>();
+                        v["mode"] = "fixed_servers";
+                        v["server"] = WuyouProxy.getProxyIpAndPort();
+                        v["User-Agent"] = UserAgent.randomUserAgent();
+                        string error;
+                        bool success = rc.SetPreference("proxy", v, out error);
+                        if (success)
+                        {
+
+                        }
+                    });
+                    //Console.WriteLine("测试load");
+                    //browser.Load("https://www.baidu.com/s?wd=%E6%88%91%E7%9A%84ip&rsv_spt=1&rsv_iqid=0x914838db0001e715&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=94789287_hao_pg&rsv_enter=1&rsv_sug3=5&rsv_sug1=3&rsv_sug7=100&rsv_t=2fec3e53%2FvqkD9VS1c4ogr84NRknqB%2FGqrZrxz5Cxm5EsGDivYD6hdnRTYE7%2BQZBJN4p7tl%2B");
+                    Random rd = new Random();
+                    int randomSleepSecond = rd.Next(1, 6);//1-5秒
+                    Console.WriteLine("点击下载之头，随机睡眠：" + randomSleepSecond + "s");
+                    Thread.Sleep(randomSleepSecond * 1000);
+
                     Console.WriteLine("城通网盘下载页面，开始下载...");
                     browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("document.getElementById('free_down_link').click();");
                 }
@@ -192,7 +220,6 @@ namespace DeepNaiWorkshop_5002
             //获取系统时间 20:16:16  
             //textBox1.Text = DateTime.Now.ToLongTimeString().ToString();
             this.label2.Text = DateTime.Now.ToLongTimeString().ToString();
-
             //执行业务逻辑
             oneThreadChengTongService();
         }
