@@ -17,7 +17,7 @@ namespace DeepNaiWorkshop_5002.MyTool
         {
             sourceFromList = new List<SourceFromData>();
 
-            sourceFromList.Add(new SourceFromData("http://blog.sina.com.cn/s/blog_1472ab5210102x8fe.html", 1));//新浪博客地址 不能用小说
+            sourceFromList.Add(new SourceFromData("http://blog.sina.com.cn/s/blog_1472ab5210102x8fe.html", 1,1,""));//新浪博客地址 不能用小说
         }
 
 

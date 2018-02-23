@@ -76,6 +76,7 @@
     <Compile Include="ChengTongForm.Designer.cs">
       <DependentUpon>ChengTongForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DefaultRequestHandler.cs" />
     <Compile Include="HttpCode\HttpCode.cs" />
     <Compile Include="HttpCode\HttpItems.cs" />
     <Compile Include="HttpCode\HttpResults.cs" />
@@ -90,6 +91,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MyDownLoadFile.cs" />
+    <Compile Include="MyRequestHandler.cs" />
     <Compile Include="MyTool\SourceFromData.cs" />
     <Compile Include="MyTool\SourceFromConfig.cs" />
     <Compile Include="MyTool\UserAgent.cs" />
