@@ -23,6 +23,7 @@ namespace DeepNaiWorkshop_5002
         //实例化一个timer  
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
         private SourceFromData sourceFromData;
+        private String userAgent;
         public MainForm()
         {
             InitializeComponent();
@@ -49,14 +50,14 @@ namespace DeepNaiWorkshop_5002
             //获取要伪装的上级页面地址
             sourceFromData = SourceFromConfig.randomSourceFromData();
             //随机的userAgent信息
-            String userAgent = UserAgent.randomUserAgent();
+            userAgent = UserAgent.randomUserAgent();
             if (!Cef.IsInitialized)
             {
                 CefSettings settings = new CefSettings() {
                     CachePath = Directory.GetCurrentDirectory() + @"\Cache",
                 };
                 settings.UserAgent = userAgent;
-                settings.PersistSessionCookies = false;//支持cookie
+                settings.PersistSessionCookies = true;//支持cookie
                 settings.CefCommandLineArgs.Add("ppapi-flash-path", @"Plugins\pepflashplayer.dll");//cef 支持flash http://blog.csdn.net/xxhongdev/article/details/77195339
 
                 //settings.CefCommandLineArgs.Add("proxy-server", ipAndPort);
@@ -126,7 +127,28 @@ namespace DeepNaiWorkshop_5002
                 {
                     if (SourceFromConfig.ROUTING_SINA_BLOG_TYPE == sourceFromData.Type)
                     {
-                        
+
+                        //每次请求更换ip
+
+                        await Cef.UIThreadTaskFactory.StartNew(delegate
+                        {
+                            //Console.WriteLine("获取的ip:" + ipAndPort);
+                            //Console.WriteLine("browser2是否初始化：" + browser);
+                            var rc = Cef.GetGlobalRequestContext();
+                            var v = new Dictionary<string,
+                                object>();
+                            v["mode"] = "fixed_servers";
+                            //v["server"] = WuyouProxy.getProxyIpAndPort();
+                            v["User-Agent"] = userAgent;
+                            v["Referer"] = sourceFromData.FromSource;//设置来源信息
+                            string error;
+                            bool success = rc.SetPreference("proxy", v, out error);
+                            if (success)
+                            {
+
+                            }
+                        });
+
                         //Random rd = new Random();
                         //int randomSleepSecond = rd.Next(1,6);//1-5秒
                         Console.WriteLine("进入的伪装路由连接：" + sourceFromData.FromSource + "，且类型为新浪博客");
@@ -168,10 +190,9 @@ namespace DeepNaiWorkshop_5002
                         var v = new Dictionary<string,
                             object>();
                         v["mode"] = "fixed_servers";
-//2018-02-22 测试关闭了代理ip
-                        v["server"] = WuyouProxy.getProxyIpAndPort();
-                        v["User-Agent"] = UserAgent.randomUserAgent();
-                        v["Referer"] = sourceFromData.FromSource;//设置来源信息
+//                        v["server"] = WuyouProxy.getProxyIpAndPort();
+                        v["User-Agent"] = userAgent;
+//                        v["Referer"] = sourceFromData.FromSource;//设置来源信息
                         string error;
                         bool success = rc.SetPreference("proxy", v, out error);
                         if (success)
