@@ -135,8 +135,7 @@ namespace DeepNaiWorkshop_5002
                             //Console.WriteLine("获取的ip:" + ipAndPort);
                             //Console.WriteLine("browser2是否初始化：" + browser);
                             var rc = Cef.GetGlobalRequestContext();
-                            var v = new Dictionary<string,
-                                object>();
+                            var v = new Dictionary<string,object>();
                             v["mode"] = "fixed_servers";
                             //v["server"] = WuyouProxy.getProxyIpAndPort();
                             v["User-Agent"] = userAgent;
