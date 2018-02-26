@@ -144,7 +144,7 @@ namespace DeepNaiWorkshop_5002
                             var v = new Dictionary<string,object>();
                             v["mode"] = "fixed_servers";
 //测试屏蔽2018-02-23 21:19:00 代理ip
- //                           v["server"] = WuyouProxy.getProxyIpAndPort();
+                            v["server"] = WuyouProxy.getProxyIpAndPort();
                             string error;
                             bool success = rc.SetPreference("proxy", v, out error);
                             if (success)
